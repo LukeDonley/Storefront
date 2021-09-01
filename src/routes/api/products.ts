@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { Product, ProductStore } from '../../models/product';
+import { verifyAuthToken } from '../../utils';
 
 const products = express.Router();
 
@@ -29,19 +30,19 @@ products.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
-products.post('/', async (req: productParams, res: Response) => {
+products.post('/', verifyAuthToken, async (req: Request, res: Response) => {
   try {
     const product: Product = {
       name: req.body.name,
       type: req.body.type,
       weight: req.body.weight,
-      category: req.body.category
+      category: req.body.category,
+      price: req.body.price
     };
     const newProduct = await store.create(product);
-    console.log(newProduct);
     res.json(newProduct);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json(err);
   }
 });
 

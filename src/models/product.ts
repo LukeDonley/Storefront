@@ -5,6 +5,7 @@ export type Product = {
   name: string;
   type: string;
   weight: number;
+  price: number;
   category?: string;
 };
 
@@ -38,20 +39,20 @@ export class ProductStore {
   async create(p: Product): Promise<Product> {
     try {
       const sql =
-        'INSERT INTO products (name, type, weight, category) VALUES ($1, $2, $3, $4)';
+        'INSERT INTO products (name, type, weight, category, price) VALUES ($1, $2, $3, $4, $5) RETURNING *';
       // @ts-ignore
       const conn = await Client.connect();
       const result = await conn.query(sql, [
         p.name,
         p.type,
         p.weight,
-        p.category
+        p.category,
+        p.price
       ]);
       const product = result.rows[0];
 
       return product;
     } catch (err) {
-      console.log(err);
       throw new Error(`Could not add new product ${p.name}. Error: ${err}`);
     }
   }
